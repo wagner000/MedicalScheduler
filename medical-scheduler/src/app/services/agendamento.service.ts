@@ -1,6 +1,9 @@
 import { Injectable } from '@angular/core';
-import { Observable, of } from 'rxjs';
+import { Observable, of, switchMap, tap } from 'rxjs';
 import { Agendamento, StatusAgendamento } from '../models/agendamento.model';
+import { PreAgendamento } from '../models/pre-agendamento.model';
+import { ClienteService } from './cliente.service';
+import { PreAgendamentoService } from './pre-agendamento.service';
 
 @Injectable({
   providedIn: 'root'
@@ -45,7 +48,10 @@ export class AgendamentoService {
     }
   ];
 
-  constructor() { }
+  constructor(
+    private clienteService: ClienteService,
+    private preAgendamentoService: PreAgendamentoService
+  ) { }
 
   getAgendamentos(): Observable<Agendamento[]> {
     return of(this.agendamentos);
@@ -118,5 +124,44 @@ export class AgendamentoService {
       a => a.colaboradorId === colaboradorId && a.data === data && a.hora === hora
     );
     return of(!agendamentoExistente);
+  }
+
+  // Método para confirmar um pré-agendamento, transformando-o em um agendamento regular
+  confirmarPreAgendamento(preAgendamento: PreAgendamento, hora: string): Observable<Agendamento> {
+    // 1. Buscamos o cliente pelo CPF ou criamos um novo
+    return this.clienteService.getClienteByCpf(preAgendamento.cpf || '').pipe(
+      switchMap(clienteExistente => {
+        if (clienteExistente) {
+          return of(clienteExistente);
+        } else {
+          // Criar um novo cliente se não existir
+          const novoCliente = {
+            id: 0, // será definido no service
+            nome: preAgendamento.nome,
+            cpf: preAgendamento.cpf || ''
+          };
+          return this.clienteService.addCliente(novoCliente);
+        }
+      }),
+      switchMap(cliente => {
+        // 2. Criar o agendamento
+        const novoAgendamento: Agendamento = {
+          id: 0, // será definido no service
+          colaboradorId: preAgendamento.colaboradorId,
+          clienteId: cliente.id,
+          data: preAgendamento.data,
+          hora: hora,
+          status: StatusAgendamento.ABERTO,
+          observacoes: preAgendamento.observacoes
+        };
+        
+        // 3. Adicionar o agendamento
+        return this.addAgendamento(novoAgendamento);
+      }),
+      tap(() => {
+        // 4. Remover o pré-agendamento
+        this.preAgendamentoService.removePreAgendamento(preAgendamento.id).subscribe();
+      })
+    );
   }
 }

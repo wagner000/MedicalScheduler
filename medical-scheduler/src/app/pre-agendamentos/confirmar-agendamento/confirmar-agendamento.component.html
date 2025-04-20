@@ -1,0 +1,86 @@
+<div class="modal-backdrop" (click)="fecharModal()">
+  <div class="modal-container" (click)="pararPropagacao($event)">
+    <div class="modal-header">
+      <h2>Confirmar Agendamento</h2>
+      <button class="btn-fechar" (click)="fecharModal()">×</button>
+    </div>
+    
+    <div class="modal-content">
+      <div class="info-paciente">
+        <div class="info-grupo">
+          <label>Paciente:</label>
+          <p>{{ preAgendamento.nome }}</p>
+        </div>
+        
+        <div class="info-grupo" *ngIf="preAgendamento.cpf">
+          <label>CPF:</label>
+          <p>{{ preAgendamento.cpf }}</p>
+        </div>
+        
+        <div class="info-grupo">
+          <label>Profissional:</label>
+          <p>{{ colaborador?.nome }} ({{ colaborador?.especialidade }})</p>
+        </div>
+        
+        <div class="info-grupo">
+          <label>Data:</label>
+          <p>{{ formatarData(preAgendamento.data) }}</p>
+        </div>
+        
+        <div class="info-grupo" *ngIf="preAgendamento.observacoes">
+          <label>Observações:</label>
+          <p>{{ preAgendamento.observacoes }}</p>
+        </div>
+      </div>
+      
+      <div class="separador"></div>
+      
+      <div class="selecao-horario">
+        <label for="horario-select">Selecione o horário de atendimento:</label>
+        <div class="horario-wrapper">
+          <select 
+            id="horario-select" 
+            [(ngModel)]="horaSelecionada" 
+            [disabled]="processando"
+          >
+            <option [value]="''" disabled>Selecione um horário</option>
+            <option *ngFor="let horario of horarios" [value]="horario">
+              {{ horario }}
+            </option>
+          </select>
+          
+          <div *ngIf="horarios.length === 0" class="sem-horarios">
+            Não há horários disponíveis para esta data.
+          </div>
+        </div>
+      </div>
+      
+      <div class="mensagens">
+        <div *ngIf="mensagemErro" class="mensagem-erro">
+          {{ mensagemErro }}
+        </div>
+        <div *ngIf="mensagemSucesso" class="mensagem-sucesso">
+          {{ mensagemSucesso }}
+        </div>
+      </div>
+    </div>
+    
+    <div class="modal-footer">
+      <button 
+        class="btn-cancelar" 
+        (click)="fecharModal()" 
+        [disabled]="processando"
+      >
+        Cancelar
+      </button>
+      <button 
+        class="btn-confirmar" 
+        (click)="confirmar()" 
+        [disabled]="!horaSelecionada || processando || horarios.length === 0"
+      >
+        <div *ngIf="processando" class="loader"></div>
+        Confirmar agendamento
+      </button>
+    </div>
+  </div>
+</div>

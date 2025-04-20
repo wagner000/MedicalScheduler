@@ -1,0 +1,139 @@
+<div class="container">
+  <div class="page-header">
+    <h1>Pré-agendamentos</h1>
+    <p>Gerenciamento de pré-agendamentos de pacientes</p>
+  </div>
+
+  <div class="scheduler-header">
+    <div class="data-navegacao">
+      <button class="btn-nav" (click)="diaAnterior()">
+        <i class="material-icons">chevron_left</i>
+      </button>
+      <div class="data-display">
+        {{ dataSelecionada | date:'dd/MM/yyyy' }}
+      </div>
+      <button class="btn-nav" (click)="diaSeguinte()">
+        <i class="material-icons">chevron_right</i>
+      </button>
+    </div>
+
+    <div class="filtro-container">
+      <div class="filtro-wrapper">
+        <label for="colaboradorFiltro">Colaborador:</label>
+        <select 
+          id="colaboradorFiltro" 
+          [(ngModel)]="colaboradorFiltroId" 
+          (change)="filtrarPorColaborador()"
+          class="form-select"
+        >
+          <option [ngValue]="undefined">Todos</option>
+          <option *ngFor="let colaborador of colaboradores" [value]="colaborador.id">
+            {{ colaborador.nome }}
+          </option>
+        </select>
+      </div>
+      <button 
+        *ngIf="colaboradorFiltroId" 
+        class="btn-limpar" 
+        (click)="limparFiltro()"
+      >
+        Limpar
+      </button>
+    </div>
+
+    <div class="adicionar-container">
+      <button class="btn-adicionar" (click)="novoPreAgendamento()">
+        <i class="material-icons">add</i>
+        Novo pré-agendamento
+      </button>
+    </div>
+  </div>
+
+  <div class="pre-agendamentos-container">
+    <table class="tabela-pre-agendamentos">
+      <thead>
+        <tr>
+          <th>Nome</th>
+          <th>CPF</th>
+          <th>Colaborador</th>
+          <th>Data</th>
+          <th>Observações</th>
+          <th>Ações</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let preAgendamento of preAgendamentos">
+          <td>{{ preAgendamento.nome }}</td>
+          <td>{{ preAgendamento.cpf || '-' }}</td>
+          <td>{{ getColaboradorNome(preAgendamento.colaboradorId) }}</td>
+          <td>{{ formatarDataExibicao(preAgendamento.data) }}</td>
+          <td>{{ preAgendamento.observacoes || '-' }}</td>
+          <td>
+            <button class="btn-check-in" (click)="fazerCheckIn(preAgendamento)">
+              <i class="material-icons">check_circle</i>
+              Fazer check-in
+            </button>
+          </td>
+        </tr>
+        <tr *ngIf="preAgendamentos.length === 0">
+          <td colspan="6" class="sem-registros">
+            <div class="sem-agendamentos">
+              <p>Não há pré-agendamentos para esta data.</p>
+              <button class="btn-adicionar" (click)="novoPreAgendamento()">
+                <i class="material-icons">add</i>
+                Novo pré-agendamento
+              </button>
+            </div>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<!-- Modal para confirmar agendamento (check-in) -->
+<div class="modal-backdrop" *ngIf="mostrarModal" (click)="fecharModal()">
+  <div class="modal-container" (click)="$event.stopPropagation()">
+    <div class="modal-header">
+      <h2>Confirmar Agendamento</h2>
+      <button class="btn-fechar" (click)="fecharModal()">×</button>
+    </div>
+    
+    <div class="modal-content" *ngIf="preAgendamentoSelecionado">
+      <div class="info-paciente">
+        <div class="info-grupo">
+          <label>Paciente:</label>
+          <p>{{ preAgendamentoSelecionado.nome }}</p>
+        </div>
+        
+        <div class="info-grupo" *ngIf="preAgendamentoSelecionado.cpf">
+          <label>CPF:</label>
+          <p>{{ preAgendamentoSelecionado.cpf }}</p>
+        </div>
+        
+        <div class="info-grupo">
+          <label>Profissional:</label>
+          <p>{{ getColaboradorNome(preAgendamentoSelecionado.colaboradorId) }}</p>
+        </div>
+        
+        <div class="info-grupo">
+          <label>Data:</label>
+          <p>{{ formatarDataExibicao(preAgendamentoSelecionado.data) }}</p>
+        </div>
+        
+        <div class="info-grupo" *ngIf="preAgendamentoSelecionado.observacoes">
+          <label>Observações:</label>
+          <p>{{ preAgendamentoSelecionado.observacoes }}</p>
+        </div>
+      </div>
+      
+      <div class="separador"></div>
+
+      <p>Em breve será possível confirmar este pré-agendamento no sistema.</p>
+    </div>
+    
+    <div class="modal-footer">
+      <button class="btn-cancelar" (click)="fecharModal()">Fechar</button>
+    </div>
+  </div>
+</div>
