@@ -80,17 +80,9 @@
                   class="agendamento-card" 
                   [ngClass]="getStatusClass(agendamento.status)"
                   [routerLink]="['/agenda', agendamento.id]"
-                  title="Clique para ver detalhes"
                 >
                   <div class="agendamento-info">
                     <p>{{ agendamento.cliente.nome }}</p>
-                  </div>
-                  
-                  <div class="agendamento-tooltip">
-                    <h4>{{ agendamento.cliente.nome }}</h4>
-                    <p><strong>Horário:</strong> {{ agendamento.horario }}</p>
-                    <p><strong>Status:</strong> {{ agendamento.status }}</p>
-                    <p *ngIf="agendamento.observacoes"><strong>Observações:</strong> {{ agendamento.observacoes }}</p>
                   </div>
                 </div>
               </ng-container>

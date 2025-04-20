@@ -201,15 +201,6 @@
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
 }
 
-.agendamento-card {
-  position: relative;
-}
-
-.agendamento-card:hover .agendamento-tooltip {
-  display: block;
-  opacity: 1;
-}
-
 .status-aberto {
   background-color: #e8f5e9;
   border-left-color: #4caf50;
@@ -237,32 +228,6 @@
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
-}
-
-.agendamento-tooltip {
-  display: none;
-  position: absolute;
-  top: -10px;
-  left: calc(100% - 10px);
-  background-color: white;
-  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
-  padding: 0.75rem;
-  border-radius: 4px;
-  z-index: 100;
-  min-width: 180px;
-  max-width: 250px;
-  pointer-events: none;
-  transition: opacity 0.2s;
-  border: 1px solid #eee;
-}
-
-.agendamento-tooltip h4 {
-  margin-top: 0;
-  margin-bottom: 0.5rem;
-}
-
-.agendamento-tooltip p {
-  margin-bottom: 0.25rem;
 }
 
 .sem-agendamentos {
