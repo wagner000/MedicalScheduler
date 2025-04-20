@@ -1,0 +1,109 @@
+<div class="card">
+  <div class="card-header">
+    <h2 class="card-title">Editar Agendamento</h2>
+  </div>
+  
+  <div class="card-body">
+    <div *ngIf="carregando" class="loader-container">
+      <div class="loader"></div>
+      <p>Carregando dados do agendamento...</p>
+    </div>
+    
+    <div *ngIf="mensagemErro" class="alert alert-danger">
+      {{ mensagemErro }}
+    </div>
+    
+    <div *ngIf="mensagemSucesso" class="alert alert-success">
+      {{ mensagemSucesso }}
+    </div>
+    
+    <form *ngIf="!carregando && agendamento && cliente" (ngSubmit)="salvar()">
+      <div class="form-section">
+        <h3>Dados do Agendamento</h3>
+        
+        <div class="form-group">
+          <label for="colaborador">Colaborador*</label>
+          <select id="colaborador" 
+                  [(ngModel)]="agendamento.colaboradorId" 
+                  name="colaboradorId"
+                  class="form-control"
+                  required
+                  (change)="verificarDisponibilidade()">
+            <option [ngValue]="0" disabled>Selecione um colaborador</option>
+            <option *ngFor="let colaborador of colaboradores" [ngValue]="colaborador.id">
+              {{ colaborador.nome }} - {{ colaborador.especialidade }}
+            </option>
+          </select>
+        </div>
+        
+        <div class="form-row">
+          <div class="form-group">
+            <label for="data">Data*</label>
+            <input type="date" 
+                   id="data" 
+                   [(ngModel)]="agendamento.data" 
+                   name="data"
+                   class="form-control"
+                   required
+                   (change)="verificarDisponibilidade()">
+          </div>
+          
+          <div class="form-group">
+            <label for="hora">Horário*</label>
+            <input type="time" 
+                   id="hora" 
+                   [(ngModel)]="agendamento.hora" 
+                   name="hora"
+                   class="form-control"
+                   required
+                   (change)="verificarDisponibilidade()">
+          </div>
+        </div>
+        
+        <div class="form-group">
+          <label for="status">Status*</label>
+          <select id="status" 
+                  [(ngModel)]="agendamento.status" 
+                  name="status"
+                  class="form-control"
+                  required>
+            <option [ngValue]="'ABERTO'">Aberto</option>
+            <option [ngValue]="'CONCLUIDO'">Concluído</option>
+            <option [ngValue]="'CANCELADO'">Cancelado</option>
+            <option [ngValue]="'NAO_COMPARECEU'">Não Compareceu</option>
+          </select>
+        </div>
+        
+        <div class="form-group">
+          <label for="observacoes">Observações</label>
+          <textarea id="observacoes" 
+                    [(ngModel)]="agendamento.observacoes" 
+                    name="observacoes"
+                    class="form-control"
+                    rows="3"></textarea>
+        </div>
+      </div>
+      
+      <div class="form-section">
+        <h3>Dados do Cliente</h3>
+        
+        <!-- Somente exibição, não é possível editar o cliente aqui -->
+        <div class="cliente-info">
+          <p><strong>Nome:</strong> {{ cliente.nome }}</p>
+          <p><strong>CPF:</strong> {{ cliente.cpf }}</p>
+          <p *ngIf="cliente.dataNascimento"><strong>Data de Nascimento:</strong> {{ cliente.dataNascimento }}</p>
+          <p *ngIf="cliente.sexo"><strong>Sexo:</strong> 
+            {{ cliente.sexo === 'M' ? 'Masculino' : cliente.sexo === 'F' ? 'Feminino' : 'Outro' }}
+          </p>
+          <p *ngIf="cliente.email"><strong>E-mail:</strong> {{ cliente.email }}</p>
+          <p *ngIf="cliente.telefone"><strong>Telefone:</strong> {{ cliente.telefone }}</p>
+        </div>
+      </div>
+      
+      <div class="form-actions">
+        <button type="button" class="btn btn-secondary" (click)="cancelar()">Cancelar</button>
+        <button type="submit" class="btn btn-primary" [disabled]="!horarioDisponivel">Salvar Alterações</button>
+      </div>
+    </form>
+  </div>
+</div>

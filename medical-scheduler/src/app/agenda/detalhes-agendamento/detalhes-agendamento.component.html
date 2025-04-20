@@ -1,0 +1,122 @@
+<div class="card">
+  <div class="card-header">
+    <h2 class="card-title">Detalhes do Agendamento</h2>
+  </div>
+  
+  <div class="card-body">
+    <div *ngIf="mensagem" class="alert alert-info">
+      {{ mensagem }}
+    </div>
+    
+    <div *ngIf="carregando" class="loader-container">
+      <div class="loader"></div>
+      <p>Carregando detalhes do agendamento...</p>
+    </div>
+    
+    <div *ngIf="erro" class="erro-container">
+      <p class="erro-mensagem">{{ mensagem }}</p>
+      <button class="btn btn-primary" (click)="voltar()">Voltar para Agenda</button>
+    </div>
+    
+    <div *ngIf="!carregando && !erro && agendamento && colaborador && cliente">
+      <div class="status-badge" [ngClass]="getStatusClass(agendamento.status)">
+        {{ getStatusText(agendamento.status) }}
+      </div>
+      
+      <div class="detalhes-grid">
+        <!-- Coluna de informações do agendamento -->
+        <div class="detalhes-coluna">
+          <h3>Informações do Agendamento</h3>
+          
+          <div class="info-grupo">
+            <p><strong>Data:</strong> {{ agendamento.data | date:'dd/MM/yyyy' }}</p>
+            <p><strong>Hora:</strong> {{ agendamento.hora }}</p>
+          </div>
+          
+          <div class="info-grupo" *ngIf="agendamento.observacoes">
+            <p><strong>Observações:</strong></p>
+            <p class="observacoes">{{ agendamento.observacoes }}</p>
+          </div>
+          
+          <div class="acoes-grupo">
+            <h4>Ações</h4>
+            
+            <div class="botoes-status">
+              <button 
+                *ngIf="agendamento.status !== statusAgendamento.CONCLUIDO" 
+                class="btn btn-success" 
+                (click)="atualizarStatus(statusAgendamento.CONCLUIDO)">
+                Marcar como Concluído
+              </button>
+              
+              <button 
+                *ngIf="agendamento.status !== statusAgendamento.CANCELADO" 
+                class="btn btn-secondary" 
+                (click)="atualizarStatus(statusAgendamento.CANCELADO)">
+                Cancelar Agendamento
+              </button>
+              
+              <button 
+                *ngIf="agendamento.status !== statusAgendamento.NAO_COMPARECEU" 
+                class="btn btn-warning" 
+                (click)="atualizarStatus(statusAgendamento.NAO_COMPARECEU)">
+                Marcar como Não Compareceu
+              </button>
+              
+              <button 
+                *ngIf="agendamento.status !== statusAgendamento.ABERTO" 
+                class="btn btn-info" 
+                (click)="atualizarStatus(statusAgendamento.ABERTO)">
+                Reabrir Agendamento
+              </button>
+            </div>
+          </div>
+        </div>
+        
+        <!-- Coluna de informações do colaborador -->
+        <div class="detalhes-coluna">
+          <h3>Informações do Colaborador</h3>
+          
+          <div class="colaborador-card">
+            <div class="colaborador-foto" *ngIf="colaborador.foto">
+              <img [src]="colaborador.foto" [alt]="colaborador.nome">
+            </div>
+            <div class="colaborador-foto" *ngIf="!colaborador.foto">
+              <div class="foto-placeholder">{{ colaborador.nome.charAt(0) }}</div>
+            </div>
+            
+            <div class="colaborador-info">
+              <h4>{{ colaborador.nome }}</h4>
+              <p><strong>Especialidade:</strong> {{ colaborador.especialidade }}</p>
+              <p *ngIf="colaborador.email"><strong>E-mail:</strong> {{ colaborador.email }}</p>
+              <p *ngIf="colaborador.telefone"><strong>Telefone:</strong> {{ colaborador.telefone }}</p>
+            </div>
+          </div>
+        </div>
+        
+        <!-- Coluna de informações do cliente -->
+        <div class="detalhes-coluna">
+          <h3>Informações do Cliente</h3>
+          
+          <div class="info-grupo">
+            <p><strong>Nome:</strong> {{ cliente.nome }}</p>
+            <p><strong>CPF:</strong> {{ cliente.cpf }}</p>
+            <p *ngIf="cliente.dataNascimento"><strong>Data de Nascimento:</strong> {{ cliente.dataNascimento | date:'dd/MM/yyyy' }}</p>
+            <p *ngIf="cliente.sexo"><strong>Sexo:</strong> 
+              {{ cliente.sexo === 'M' ? 'Masculino' : cliente.sexo === 'F' ? 'Feminino' : 'Outro' }}
+            </p>
+            <p *ngIf="cliente.email"><strong>E-mail:</strong> {{ cliente.email }}</p>
+            <p *ngIf="cliente.telefone"><strong>Telefone:</strong> {{ cliente.telefone }}</p>
+            <p *ngIf="cliente.endereco"><strong>Endereço:</strong> {{ cliente.endereco }}</p>
+          </div>
+        </div>
+      </div>
+      
+      <div class="botoes-acoes">
+        <button class="btn btn-secondary" (click)="voltar()">Voltar</button>
+        <button class="btn btn-primary" (click)="editarAgendamento()">Editar</button>
+        <button class="btn btn-danger" (click)="excluirAgendamento()">Excluir</button>
+      </div>
+    </div>
+  </div>
+</div>

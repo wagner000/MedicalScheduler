@@ -1,0 +1,129 @@
+<div class="scheduler-container">
+  <div class="scheduler-header">
+    <div class="filtro-container">
+      <button class="btn btn-secondary" (click)="abrirFiltroModal()">
+        <i class="fas fa-filter"></i> Filtrar
+      </button>
+    </div>
+    
+    <div class="data-navegacao">
+      <button class="btn btn-navegacao" (click)="diaAnterior()">
+        <i class="fas fa-chevron-left"></i>
+      </button>
+      
+      <h2 class="data-atual" (click)="abrirCalendario()">{{ dataFormatada }}</h2>
+      
+      <button class="btn btn-navegacao" (click)="diaSeguinte()">
+        <i class="fas fa-chevron-right"></i>
+      </button>
+    </div>
+    
+    <div class="adicionar-container">
+      <a routerLink="/agenda/novo" class="btn btn-primary">
+        <i class="fas fa-plus"></i> Adicionar horário
+      </a>
+    </div>
+  </div>
+  
+  <div class="scheduler-content">
+    <!-- Caso não tenham colaboradores com agendamentos -->
+    <div *ngIf="colaboradoresComAgendamentos.length === 0" class="sem-agendamentos">
+      <p>Não existem agendamentos para esta data.</p>
+      <a routerLink="/agenda/novo" class="btn btn-primary">
+        Adicionar novo agendamento
+      </a>
+    </div>
+    
+    <!-- Layout de agendamentos em colunas por colaborador -->
+    <div *ngIf="colaboradoresComAgendamentos.length > 0" class="agendamentos-grid">
+      <!-- Cabeçalho com colaboradores -->
+      <div class="header-row">
+        <div class="time-column">Horário</div>
+        <div class="colaborador-column" *ngFor="let colaborador of colaboradoresComAgendamentos">
+          <div class="colaborador-header">
+            <div class="colaborador-foto" *ngIf="colaborador.foto">
+              <img [src]="colaborador.foto" [alt]="colaborador.nome">
+            </div>
+            <div class="colaborador-foto" *ngIf="!colaborador.foto">
+              <div class="foto-placeholder">{{ colaborador.nome.charAt(0) }}</div>
+            </div>
+            <div class="colaborador-info">
+              <h3>{{ colaborador.nome }}</h3>
+              <p>{{ colaborador.especialidade }}</p>
+            </div>
+          </div>
+        </div>
+      </div>
+      
+      <!-- Grade de horários - de 8h às 18h, a cada 30 minutos -->
+      <ng-container *ngFor="let hora of ['08:00', '08:30', '09:00', '09:30', '10:00', '10:30', '11:00', '11:30', '12:00', '12:30', '13:00', '13:30', '14:00', '14:30', '15:00', '15:30', '16:00', '16:30', '17:00', '17:30', '18:00']">
+        <div class="time-row">
+          <div class="time-column">{{ hora }}</div>
+          
+          <div class="agendamento-column" *ngFor="let colaborador of colaboradoresComAgendamentos">
+            <!-- Encontrar agendamento neste horário para este colaborador -->
+            <ng-container *ngFor="let agendamento of getAgendamentosParaColaborador(colaborador.id)">
+              <div 
+                *ngIf="agendamento.horario === hora" 
+                class="agendamento-card" 
+                [ngClass]="getStatusClass(agendamento.status)"
+                [routerLink]="['/agenda', agendamento.id]"
+              >
+                <div class="tooltip-container">
+                  <div class="agendamento-info">
+                    <p>{{ agendamento.cliente.nome }}</p>
+                  </div>
+                  
+                  <div class="agendamento-tooltip">
+                    <h4>{{ agendamento.cliente.nome }}</h4>
+                    <p><strong>Horário:</strong> {{ agendamento.horario }}</p>
+                    <p><strong>Status:</strong> {{ agendamento.status }}</p>
+                    <p *ngIf="agendamento.observacoes"><strong>Observações:</strong> {{ agendamento.observacoes }}</p>
+                  </div>
+                </div>
+              </div>
+            </ng-container>
+          </div>
+        </div>
+      </ng-container>
+    </div>
+  </div>
+</div>
+
+<!-- Modal de Filtro -->
+<div class="modal-backdrop" *ngIf="mostrarFiltroModal" (click)="fecharFiltroModal()">
+  <div class="modal-container" (click)="$event.stopPropagation()">
+    <div class="modal-header">
+      <h2>Filtrar Agendamentos</h2>
+      <button class="btn-fechar" (click)="fecharFiltroModal()">×</button>
+    </div>
+    
+    <div class="modal-content">
+      <div class="form-group">
+        <label for="colaborador">Colaborador</label>
+        <select id="colaborador" [(ngModel)]="filtroColaboradorTemp" class="form-control">
+          <option [ngValue]="undefined">Todos os colaboradores</option>
+          <option *ngFor="let colaborador of colaboradores" [ngValue]="colaborador.id">
+            {{ colaborador.nome }}
+          </option>
+        </select>
+      </div>
+      
+      <div class="form-group">
+        <label for="status">Status</label>
+        <select id="status" [(ngModel)]="filtroStatusTemp" class="form-control">
+          <option [ngValue]="undefined">Todos os status</option>
+          <option [ngValue]="'ABERTO'">Aberto</option>
+          <option [ngValue]="'CONCLUIDO'">Concluído</option>
+          <option [ngValue]="'CANCELADO'">Cancelado</option>
+          <option [ngValue]="'NAO_COMPARECEU'">Não compareceu</option>
+        </select>
+      </div>
+    </div>
+    
+    <div class="modal-footer">
+      <button class="btn btn-secondary" (click)="limparFiltros()">Limpar Filtros</button>
+      <button class="btn btn-primary" (click)="aplicarFiltro(filtroColaboradorTemp, filtroStatusTemp)">Aplicar</button>
+    </div>
+  </div>
+</div>

@@ -1,0 +1,36 @@
+<div class="modal-backdrop" (click)="fecharModal()">
+  <div class="modal-container" (click)="pararPropagacao($event)">
+    <div class="modal-header">
+      <h2>Filtrar Agendamentos</h2>
+      <button class="btn-fechar" (click)="fecharModal()">×</button>
+    </div>
+    
+    <div class="modal-content">
+      <div class="form-group">
+        <label for="colaborador">Colaborador</label>
+        <select id="colaborador" [(ngModel)]="selectedColaboradorId" class="form-control">
+          <option [ngValue]="undefined">Todos os colaboradores</option>
+          <option *ngFor="let colaborador of colaboradores" [ngValue]="colaborador.id">
+            {{ colaborador.nome }}
+          </option>
+        </select>
+      </div>
+      
+      <div class="form-group">
+        <label for="status">Status</label>
+        <select id="status" [(ngModel)]="selectedStatus" class="form-control">
+          <option [ngValue]="undefined">Todos os status</option>
+          <option [ngValue]="statusAgendamento.ABERTO">Aberto</option>
+          <option [ngValue]="statusAgendamento.CONCLUIDO">Concluído</option>
+          <option [ngValue]="statusAgendamento.CANCELADO">Cancelado</option>
+          <option [ngValue]="statusAgendamento.NAO_COMPARECEU">Não compareceu</option>
+        </select>
+      </div>
+    </div>
+    
+    <div class="modal-footer">
+      <button class="btn btn-secondary" (click)="limpar()">Limpar Filtros</button>
+      <button class="btn btn-primary" (click)="aplicar()">Aplicar</button>
+    </div>
+  </div>
+</div>
