@@ -38,12 +38,7 @@ export class AgendaComponent implements OnInit {
   filtroColaboradorTemp?: number;
   filtroStatusTemp?: StatusAgendamento;
   mostrarFiltroModal = false;
-  horariosDisponiveis: string[] = [
-    '08:00', '08:30', '09:00', '09:30', '10:00', '10:30', 
-    '11:00', '11:30', '12:00', '12:30', '13:00', '13:30', 
-    '14:00', '14:30', '15:00', '15:30', '16:00', '16:30', 
-    '17:00', '17:30', '18:00'
-  ];
+  horariosDisponiveis: string[] = [];
 
   constructor(
     private agendamentoService: AgendamentoService,
@@ -119,6 +114,80 @@ export class AgendaComponent implements OnInit {
         observacoes: agendamento.observacoes
       };
     }).filter(a => a !== null) as AgendamentoView[];
+    
+    // Depois de mapear os agendamentos, identificar os horários disponíveis
+    this.identificarHorariosDisponiveis();
+  }
+
+  identificarHorariosDisponiveis(): void {
+    // Se não houver agendamentos, definir um horário padrão
+    if (this.agendamentosView.length === 0) {
+      this.horariosDisponiveis = [
+        '08:00', '08:30', '09:00', '09:30', '10:00', '10:30', 
+        '11:00', '11:30', '12:00', '12:30', '13:00', '13:30', 
+        '14:00', '14:30', '15:00', '15:30', '16:00', '16:30', 
+        '17:00', '17:30', '18:00'
+      ];
+      return;
+    }
+    
+    // Extrair os horários únicos dos agendamentos
+    const horariosSet = new Set<string>();
+    this.agendamentosView.forEach(agendamento => {
+      horariosSet.add(agendamento.horario);
+    });
+    
+    // Converter o Set para array
+    let horarios = Array.from(horariosSet);
+    
+    // Ordenar os horários
+    horarios.sort((a, b) => {
+      return a.localeCompare(b);
+    });
+    
+    // Verificar se há horários suficientes para exibir
+    // Se houver poucos, adicionar horários extras para ter no mínimo 10 faixas
+    if (horarios.length < 10) {
+      // Adicionar 30 minutos antes do primeiro horário e 30 minutos depois do último
+      const primeiroHorario = this.converterHoraParaMinutos(horarios[0]);
+      const ultimoHorario = this.converterHoraParaMinutos(horarios[horarios.length - 1]);
+      
+      // Adicionar slots de 30 minutos antes
+      for (let i = 1; i <= 3; i++) {
+        const novoHorario = primeiroHorario - (i * 30);
+        if (novoHorario >= 0) { // Garantir que não vá para um horário negativo
+          horarios.push(this.converterMinutosParaHora(novoHorario));
+        }
+      }
+      
+      // Adicionar slots de 30 minutos depois
+      for (let i = 1; i <= 3; i++) {
+        const novoHorario = ultimoHorario + (i * 30);
+        if (novoHorario < 24 * 60) { // Garantir que não ultrapasse as 24 horas
+          horarios.push(this.converterMinutosParaHora(novoHorario));
+        }
+      }
+      
+      // Reordenar após adicionar novos horários
+      horarios.sort((a, b) => {
+        return a.localeCompare(b);
+      });
+    }
+    
+    this.horariosDisponiveis = horarios;
+  }
+  
+  // Método auxiliar para converter um horário no formato "HH:MM" para minutos
+  converterHoraParaMinutos(hora: string): number {
+    const [horas, minutos] = hora.split(':').map(Number);
+    return horas * 60 + minutos;
+  }
+  
+  // Método auxiliar para converter minutos para um horário no formato "HH:MM"
+  converterMinutosParaHora(minutos: number): string {
+    const horas = Math.floor(minutos / 60);
+    const mins = minutos % 60;
+    return `${horas.toString().padStart(2, '0')}:${mins.toString().padStart(2, '0')}`;
   }
 
   identificarColaboradoresComAgendamentos(): void {

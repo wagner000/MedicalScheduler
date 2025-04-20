@@ -12,9 +12,9 @@ export class AgendamentoService {
       colaboradorId: 1,
       clienteId: 1,
       data: '2025-04-20',
-      hora: '09:00',
+      hora: '05:00',
       status: StatusAgendamento.ABERTO,
-      observacoes: 'Consulta de rotina'
+      observacoes: 'Consulta de rotina (manhã cedo)'
     },
     {
       id: 2,
