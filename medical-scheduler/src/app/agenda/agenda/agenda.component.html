@@ -36,10 +36,18 @@
     
     <!-- Layout de agendamentos em colunas por colaborador -->
     <div *ngIf="colaboradoresComAgendamentos.length > 0" class="agendamentos-grid">
-      <!-- Cabeçalho com colaboradores -->
-      <div class="header-row">
-        <div class="time-column">Horário</div>
-        <div class="colaborador-column" *ngFor="let colaborador of colaboradoresComAgendamentos">
+      <!-- Coluna de horários à esquerda -->
+      <div class="horarios-coluna">
+        <div class="horario-celula" *ngFor="let hora of horariosDisponiveis">
+          {{ hora }}
+        </div>
+      </div>
+      
+      <!-- Área com colunas de colaboradores -->
+      <div class="colaboradores-area">
+        <!-- Uma coluna por colaborador que tem agendamentos -->
+        <div class="colaborador-coluna" *ngFor="let colaborador of colaboradoresComAgendamentos">
+          <!-- Cabeçalho com foto e informações do colaborador -->
           <div class="colaborador-header">
             <div class="colaborador-foto" *ngIf="colaborador.foto">
               <img [src]="colaborador.foto" [alt]="colaborador.nome">
@@ -52,40 +60,36 @@
               <p>{{ colaborador.especialidade }}</p>
             </div>
           </div>
-        </div>
-      </div>
-      
-      <!-- Grade de horários - de 8h às 18h, a cada 30 minutos -->
-      <ng-container *ngFor="let hora of ['08:00', '08:30', '09:00', '09:30', '10:00', '10:30', '11:00', '11:30', '12:00', '12:30', '13:00', '13:30', '14:00', '14:30', '15:00', '15:30', '16:00', '16:30', '17:00', '17:30', '18:00']">
-        <div class="time-row">
-          <div class="time-column">{{ hora }}</div>
           
-          <div class="agendamento-column" *ngFor="let colaborador of colaboradoresComAgendamentos">
-            <!-- Encontrar agendamento neste horário para este colaborador -->
-            <ng-container *ngFor="let agendamento of getAgendamentosParaColaborador(colaborador.id)">
-              <div 
-                *ngIf="agendamento.horario === hora" 
-                class="agendamento-card" 
-                [ngClass]="getStatusClass(agendamento.status)"
-                [routerLink]="['/agenda', agendamento.id]"
-              >
-                <div class="tooltip-container">
-                  <div class="agendamento-info">
-                    <p>{{ agendamento.cliente.nome }}</p>
-                  </div>
-                  
-                  <div class="agendamento-tooltip">
-                    <h4>{{ agendamento.cliente.nome }}</h4>
-                    <p><strong>Horário:</strong> {{ agendamento.horario }}</p>
-                    <p><strong>Status:</strong> {{ agendamento.status }}</p>
-                    <p *ngIf="agendamento.observacoes"><strong>Observações:</strong> {{ agendamento.observacoes }}</p>
+          <!-- Slots de agendamento para cada horário disponível -->
+          <div class="agendamentos-coluna">
+            <div class="agendamento-slot" *ngFor="let hora of horariosDisponiveis">
+              <!-- Agendamento neste horário para este colaborador, se existir -->
+              <ng-container *ngFor="let agendamento of getAgendamentosParaColaborador(colaborador.id)">
+                <div 
+                  *ngIf="agendamento.horario === hora" 
+                  class="agendamento-card" 
+                  [ngClass]="getStatusClass(agendamento.status)"
+                  [routerLink]="['/agenda', agendamento.id]"
+                >
+                  <div class="tooltip-container">
+                    <div class="agendamento-info">
+                      <p>{{ agendamento.cliente.nome }}</p>
+                    </div>
+                    
+                    <div class="agendamento-tooltip">
+                      <h4>{{ agendamento.cliente.nome }}</h4>
+                      <p><strong>Horário:</strong> {{ agendamento.horario }}</p>
+                      <p><strong>Status:</strong> {{ agendamento.status }}</p>
+                      <p *ngIf="agendamento.observacoes"><strong>Observações:</strong> {{ agendamento.observacoes }}</p>
+                    </div>
                   </div>
                 </div>
-              </div>
-            </ng-container>
+              </ng-container>
+            </div>
           </div>
         </div>
-      </ng-container>
+      </div>
     </div>
   </div>
 </div>
