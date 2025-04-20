@@ -80,6 +80,7 @@
                   class="agendamento-card" 
                   [ngClass]="getStatusClass(agendamento.status)"
                   [routerLink]="['/agenda', agendamento.id]"
+                  title="Clique para ver detalhes"
                 >
                   <div class="agendamento-info">
                     <p>{{ agendamento.cliente.nome }}</p>
