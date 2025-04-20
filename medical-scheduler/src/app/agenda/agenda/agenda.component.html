@@ -36,19 +36,14 @@
     
     <!-- Layout de agendamentos em colunas por colaborador -->
     <div *ngIf="colaboradoresComAgendamentos.length > 0" class="agendamentos-grid">
-      <!-- Coluna de horários à esquerda -->
-      <div class="horarios-coluna">
-        <div class="horario-celula" *ngFor="let hora of horariosDisponiveis">
-          {{ hora }}
-        </div>
-      </div>
-      
-      <!-- Área com colunas de colaboradores -->
-      <div class="colaboradores-area">
-        <!-- Uma coluna por colaborador que tem agendamentos -->
-        <div class="colaborador-coluna" *ngFor="let colaborador of colaboradoresComAgendamentos">
-          <!-- Cabeçalho com foto e informações do colaborador -->
-          <div class="colaborador-header">
+      <!-- Área das colunas -->
+      <div class="colunas-container">
+        <!-- Coluna vazia para alinhar com as colunas de colaboradores -->
+        <div class="horarios-header"></div>
+        
+        <!-- Cabeçalhos de colaboradores -->
+        <div class="colaboradores-headers">
+          <div class="colaborador-header" *ngFor="let colaborador of colaboradoresComAgendamentos">
             <div class="colaborador-foto" *ngIf="colaborador.foto">
               <img [src]="colaborador.foto" [alt]="colaborador.nome">
             </div>
@@ -60,9 +55,23 @@
               <p>{{ colaborador.especialidade }}</p>
             </div>
           </div>
-          
-          <!-- Slots de agendamento para cada horário disponível -->
-          <div class="agendamentos-coluna">
+        </div>
+      </div>
+      
+      <!-- Área principal de agendamentos -->
+      <div class="agendamentos-container">
+        <!-- Coluna de horários à esquerda -->
+        <div class="horarios-coluna">
+          <div class="horario-celula" *ngFor="let hora of horariosDisponiveis">
+            {{ hora }}
+          </div>
+        </div>
+        
+        <!-- Área de slots de agendamento -->
+        <div class="agendamentos-area">
+          <!-- Colunas de agendamentos -->
+          <div class="agendamento-coluna" *ngFor="let colaborador of colaboradoresComAgendamentos">
+            <!-- Slots por horário -->
             <div class="agendamento-slot" *ngFor="let hora of horariosDisponiveis">
               <!-- Agendamento neste horário para este colaborador, se existir -->
               <ng-container *ngFor="let agendamento of getAgendamentosParaColaborador(colaborador.id)">
@@ -72,17 +81,15 @@
                   [ngClass]="getStatusClass(agendamento.status)"
                   [routerLink]="['/agenda', agendamento.id]"
                 >
-                  <div class="tooltip-container">
-                    <div class="agendamento-info">
-                      <p>{{ agendamento.cliente.nome }}</p>
-                    </div>
-                    
-                    <div class="agendamento-tooltip">
-                      <h4>{{ agendamento.cliente.nome }}</h4>
-                      <p><strong>Horário:</strong> {{ agendamento.horario }}</p>
-                      <p><strong>Status:</strong> {{ agendamento.status }}</p>
-                      <p *ngIf="agendamento.observacoes"><strong>Observações:</strong> {{ agendamento.observacoes }}</p>
-                    </div>
+                  <div class="agendamento-info">
+                    <p>{{ agendamento.cliente.nome }}</p>
+                  </div>
+                  
+                  <div class="agendamento-tooltip">
+                    <h4>{{ agendamento.cliente.nome }}</h4>
+                    <p><strong>Horário:</strong> {{ agendamento.horario }}</p>
+                    <p><strong>Status:</strong> {{ agendamento.status }}</p>
+                    <p *ngIf="agendamento.observacoes"><strong>Observações:</strong> {{ agendamento.observacoes }}</p>
                   </div>
                 </div>
               </ng-container>

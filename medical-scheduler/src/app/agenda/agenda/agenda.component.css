@@ -55,10 +55,50 @@
 
 .agendamentos-grid {
   display: flex;
+  flex-direction: column;
   background-color: #fff;
   border-radius: 4px;
   overflow: hidden;
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+/* Configuração dos cabeçalhos */
+.colunas-container {
+  display: flex;
+  border-bottom: 1px solid #eee;
+}
+
+.horarios-header {
+  flex: 0 0 60px;
+  border-right: 1px solid #eee;
+}
+
+.colaboradores-headers {
+  display: flex;
+  flex: 1;
+  overflow-x: auto;
+}
+
+.colaborador-header {
+  flex: 0 0 200px;
+  min-width: 200px;
+  padding: 1rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  border-right: 1px solid #eee;
+}
+
+.colaborador-header:last-child {
+  border-right: none;
+}
+
+/* Configuração da área de agendamentos */
+.agendamentos-container {
+  display: flex;
+  flex: 1;
+  overflow: auto;
 }
 
 .horarios-coluna {
@@ -78,35 +118,20 @@
   font-weight: 500;
 }
 
-.colaboradores-area {
+.agendamentos-area {
   display: flex;
   flex: 1;
   overflow-x: auto;
-  scrollbar-width: thin;
 }
 
-.colaborador-coluna {
+.agendamento-coluna {
   flex: 0 0 200px;
   min-width: 200px;
   border-right: 1px solid #eee;
-  position: relative;
 }
 
-.colaborador-coluna:last-child {
+.agendamento-coluna:last-child {
   border-right: none;
-}
-
-.colaborador-header {
-  position: sticky;
-  top: 0;
-  z-index: 5;
-  background-color: white;
-  padding: 0.75rem;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  text-align: center;
-  border-bottom: 1px solid #eee;
 }
 
 .colaborador-foto {
@@ -138,10 +163,6 @@
   justify-content: center;
   font-size: 1.5rem;
   font-weight: 500;
-}
-
-.agendamentos-coluna {
-  position: relative;
 }
 
 .agendamento-slot {
@@ -180,6 +201,10 @@
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
 }
 
+.agendamento-card:hover .agendamento-tooltip {
+  display: block;
+}
+
 .status-aberto {
   background-color: #e8f5e9;
   border-left-color: #4caf50;
@@ -209,26 +234,19 @@
   text-overflow: ellipsis;
 }
 
-.tooltip-container {
-  position: relative;
-}
-
 .agendamento-tooltip {
   display: none;
   position: absolute;
-  top: calc(100% + 5px);
-  left: 0;
+  top: 0;
+  left: 100%;
   background-color: white;
   box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
   padding: 1rem;
   border-radius: 4px;
-  z-index: 10;
+  z-index: 100;
   min-width: 200px;
   max-width: 300px;
-}
-
-.tooltip-container:hover .agendamento-tooltip {
-  display: block;
+  margin-left: 5px;
 }
 
 .agendamento-tooltip h4 {
