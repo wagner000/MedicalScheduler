@@ -4,8 +4,11 @@ import { FormsModule } from '@angular/forms';
 import { Router, RouterModule } from '@angular/router';
 import { PreAgendamento } from '../../models/pre-agendamento.model';
 import { Colaborador } from '../../models/colaborador.model';
+import { Cliente } from '../../models/cliente.model';
 import { PreAgendamentoService } from '../../services/pre-agendamento.service';
 import { ColaboradorService } from '../../services/colaborador.service';
+import { ClienteService } from '../../services/cliente.service';
+import { switchMap } from 'rxjs/operators';
 
 @Component({
   selector: 'app-novo-pre-agendamento',
@@ -31,6 +34,7 @@ export class NovoPreAgendamentoComponent implements OnInit {
   constructor(
     private preAgendamentoService: PreAgendamentoService,
     private colaboradorService: ColaboradorService,
+    private clienteService: ClienteService,
     private router: Router
   ) { }
 
@@ -72,16 +76,17 @@ export class NovoPreAgendamentoComponent implements OnInit {
     }
     
     this.preAgendamento.cpf = cpf;
+    this.buscarClientePorCpf();
   }
 
   validarFormulario(): boolean {
-    if (!this.preAgendamento.nome || this.preAgendamento.nome.trim().length < 3) {
-      this.mensagemErro = 'Nome deve ter pelo menos 3 caracteres';
+    if (!this.preAgendamento.cpf || this.preAgendamento.cpf.replace(/\D/g, '').length !== 11) {
+      this.mensagemErro = 'CPF é obrigatório e deve ser válido';
       return false;
     }
 
-    if (this.preAgendamento.cpf && this.preAgendamento.cpf.replace(/\D/g, '').length !== 11) {
-      this.mensagemErro = 'CPF inválido';
+    if (!this.preAgendamento.nome || this.preAgendamento.nome.trim().length < 3) {
+      this.mensagemErro = 'Nome deve ter pelo menos 3 caracteres';
       return false;
     }
 
@@ -98,6 +103,21 @@ export class NovoPreAgendamentoComponent implements OnInit {
     return true;
   }
 
+  buscarClientePorCpf(): void {
+    if (!this.preAgendamento.cpf) return;
+
+    const cpfLimpo = this.preAgendamento.cpf.replace(/\D/g, '');
+    if (cpfLimpo.length !== 11) return;
+
+    if (!this.preAgendamento.cpf) return;
+    
+    this.clienteService.getClienteByCpf(this.preAgendamento.cpf).subscribe(cliente => {
+      if (cliente) {
+        this.preAgendamento.nome = cliente.nome;
+      }
+    });
+  }
+
   salvar(): void {
     if (!this.validarFormulario()) {
       return;
@@ -106,7 +126,38 @@ export class NovoPreAgendamentoComponent implements OnInit {
     this.mensagemErro = '';
     this.mensagemSucesso = 'Salvando...';
 
-    this.preAgendamentoService.addPreAgendamento(this.preAgendamento).subscribe({
+    // Primeiro verifica se já existe um cliente com este CPF
+    if (!this.preAgendamento.cpf) {
+      this.mensagemErro = 'CPF é obrigatório';
+      this.mensagemSucesso = '';
+      return;
+    }
+
+    this.clienteService.getClienteByCpf(this.preAgendamento.cpf).pipe(
+      switchMap(clienteExistente => {
+        if (clienteExistente) {
+          // Se o cliente já existe, usa o cliente existente
+          return this.preAgendamentoService.addPreAgendamento(this.preAgendamento);
+        } else {
+          // Se o cliente não existe, cria um novo cliente
+          const novoCliente: Cliente = {
+            id: 0, // será gerado pelo serviço
+            nome: this.preAgendamento.nome,
+            cpf: this.preAgendamento.cpf || '', // garantir que não seja undefined
+            dataNascimento: new Date().toISOString().split('T')[0], // data atual como padrão
+            sexo: 'O', // O para Outro/Não informado
+            email: 'não informado',
+            telefone: 'não informado',
+            endereco: 'não informado'
+          };
+
+          // Primeiro cria o cliente, depois cria o pré-agendamento
+          return this.clienteService.addCliente(novoCliente).pipe(
+            switchMap(() => this.preAgendamentoService.addPreAgendamento(this.preAgendamento))
+          );
+        }
+      })
+    ).subscribe({
       next: (preAgendamento) => {
         this.mensagemSucesso = 'Pré-agendamento realizado com sucesso!';
         setTimeout(() => {

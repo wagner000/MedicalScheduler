@@ -71,6 +71,7 @@ export class AgendaComponent implements OnInit {
       // Carregar clientes
       this.clienteService.getClientes().subscribe(clientes => {
         this.clientes = clientes;
+        console.log('CLIENTES', this.clientes);
         
         // Carregar agendamentos para a data selecionada
         this.agendamentoService.getAgendamentosByData(dataFormatadaYYYYMMDD).subscribe(agendamentos => {

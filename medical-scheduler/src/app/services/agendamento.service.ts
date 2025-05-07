@@ -1,6 +1,8 @@
 import { Injectable } from '@angular/core';
-import { Observable, of, switchMap, tap } from 'rxjs';
+import { Observable, of } from 'rxjs';
+import { switchMap, tap } from 'rxjs/operators';
 import { Agendamento, StatusAgendamento } from '../models/agendamento.model';
+import { Cliente } from '../models/cliente.model';
 import { PreAgendamento } from '../models/pre-agendamento.model';
 import { ClienteService } from './cliente.service';
 import { PreAgendamentoService } from './pre-agendamento.service';
@@ -74,6 +76,9 @@ export class AgendamentoService {
 
   getAgendamentosByData(data: string): Observable<Agendamento[]> {
     const filteredAgendamentos = this.agendamentos.filter(a => a.data === data);
+    console.log('DATA', data);
+    console.log('AGENDAMENTOS', this.agendamentos);
+    console.log('FILTERED', filteredAgendamentos);
     return of(filteredAgendamentos);
   }
 
@@ -89,6 +94,7 @@ export class AgendamentoService {
     const newId = Math.max(...this.agendamentos.map(a => a.id)) + 1;
     const newAgendamento = { ...agendamento, id: newId };
     this.agendamentos.push(newAgendamento);
+    console.log(this.agendamentos);
     return of(newAgendamento);
   }
 
@@ -128,23 +134,43 @@ export class AgendamentoService {
 
   // Método para confirmar um pré-agendamento, transformando-o em um agendamento regular
   confirmarPreAgendamento(preAgendamento: PreAgendamento, hora: string): Observable<Agendamento> {
-    // 1. Buscamos o cliente pelo CPF ou criamos um novo
-    return this.clienteService.getClienteByCpf(preAgendamento.cpf || '').pipe(
-      switchMap(clienteExistente => {
+    if (!preAgendamento.cpf) {
+      throw new Error('CPF é obrigatório para confirmar o agendamento');
+    }
+
+    console.log('confirmarPreAgendamento', preAgendamento, hora);
+    
+    // 1. Buscamos o cliente pelo CPF
+    return this.clienteService.getClienteByCpf(preAgendamento.cpf).pipe(
+      switchMap((clienteExistente: Cliente | undefined) => {
+        // Se o cliente existir, retorna ele
         if (clienteExistente) {
+          console.log('Cliente existente encontrado:', clienteExistente);
           return of(clienteExistente);
-        } else {
-          // Criar um novo cliente se não existir
-          const novoCliente = {
-            id: 0, // será definido no service
-            nome: preAgendamento.nome,
-            cpf: preAgendamento.cpf || ''
-          };
-          return this.clienteService.addCliente(novoCliente);
         }
+        
+        // Se não existir, cria um novo
+        console.log('Cliente não encontrado, criando novo...');
+        const novoCliente: Cliente = {
+          id: 0, // será definido no service
+          nome: preAgendamento.nome,
+          cpf: preAgendamento.cpf || '',
+          dataNascimento: new Date().toISOString().split('T')[0],
+          sexo: 'O', // O para Outro/Não informado
+          email: 'não informado',
+          telefone: 'não informado',
+          endereco: 'não informado'
+        };
+        return this.clienteService.addCliente(novoCliente);
       }),
-      switchMap(cliente => {
+      switchMap((cliente: Cliente) => {
         // 2. Criar o agendamento
+        console.log('Cliente para criar agendamento:', cliente);
+        
+        if (!cliente || !cliente.id) {
+          throw new Error('Cliente inválido ao criar agendamento');
+        }
+
         const novoAgendamento: Agendamento = {
           id: 0, // será definido no service
           colaboradorId: preAgendamento.colaboradorId,
@@ -152,9 +178,10 @@ export class AgendamentoService {
           data: preAgendamento.data,
           hora: hora,
           status: StatusAgendamento.ABERTO,
-          observacoes: preAgendamento.observacoes
+          observacoes: preAgendamento.observacoes || ''
         };
-        
+
+        console.log('Criando novo agendamento:', novoAgendamento);
         // 3. Adicionar o agendamento
         return this.addAgendamento(novoAgendamento);
       }),

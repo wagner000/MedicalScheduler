@@ -264,6 +264,43 @@
   margin: 1.5rem 0;
 }
 
+.selecao-horario {
+  margin-top: 1rem;
+}
+
+.selecao-horario label {
+  display: block;
+  font-size: 0.875rem;
+  color: #666;
+  margin-bottom: 0.5rem;
+}
+
+.mensagem-erro {
+  color: #d32f2f;
+  font-size: 0.875rem;
+  margin-top: 0.5rem;
+}
+
+.btn-confirmar {
+  padding: 0.75rem 1.5rem;
+  background-color: #4caf50;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 1rem;
+  transition: background-color 0.2s;
+}
+
+.btn-confirmar:hover {
+  background-color: #388e3c;
+}
+
+.btn-confirmar:disabled {
+  background-color: #ccc;
+  cursor: not-allowed;
+}
+
 .modal-footer {
   display: flex;
   justify-content: flex-end;

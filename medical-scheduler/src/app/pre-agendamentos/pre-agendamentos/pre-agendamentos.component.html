@@ -129,11 +129,26 @@
       
       <div class="separador"></div>
 
-      <p>Em breve será possível confirmar este pré-agendamento no sistema.</p>
+      <div class="selecao-horario">
+        <label for="horario">Selecione o horário do atendimento:</label>
+        <select id="horario" [(ngModel)]="horarioSelecionado" class="form-select">
+          <option value="">Selecione um horário</option>
+          <option *ngFor="let horario of horariosDisponiveis" [value]="horario">
+            {{ horario }}
+          </option>
+        </select>
+      </div>
+
+      <div class="mensagem-erro" *ngIf="mensagemErro">
+        {{ mensagemErro }}
+      </div>
     </div>
     
     <div class="modal-footer">
-      <button class="btn-cancelar" (click)="fecharModal()">Fechar</button>
+      <button class="btn-cancelar" (click)="fecharModal()">Cancelar</button>
+      <button class="btn-confirmar" (click)="confirmarAgendamento()" [disabled]="!horarioSelecionado">
+        Confirmar Agendamento
+      </button>
     </div>
   </div>
 </div>
