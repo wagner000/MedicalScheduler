@@ -1,7 +1,9 @@
+import { Cliente } from "./cliente.model";
+
 export interface Agendamento {
   id: number;
   colaboradorId: number;
-  clienteId: number;
+  cliente?: Cliente;
   data: string; // Formato: YYYY-MM-DD
   hora: string; // Formato: HH:MM
   status: StatusAgendamento;

@@ -59,7 +59,6 @@ export class ClienteService {
     // Gerando ID (em uma aplicação real, isso seria feito pelo backend)
     const newId = Math.max(...this.clientes.map(c => c.id)) + 1;
     const newCliente = { ...cliente, id: newId };
-    console.log('newCliente', newCliente);
     this.clientes.push(newCliente);
     return of(newCliente);
   }

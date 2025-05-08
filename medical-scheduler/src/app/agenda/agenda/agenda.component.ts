@@ -71,7 +71,6 @@ export class AgendaComponent implements OnInit {
       // Carregar clientes
       this.clienteService.getClientes().subscribe(clientes => {
         this.clientes = clientes;
-        console.log('CLIENTES', this.clientes);
         
         // Carregar agendamentos para a data selecionada
         this.agendamentoService.getAgendamentosByData(dataFormatadaYYYYMMDD).subscribe(agendamentos => {
@@ -99,7 +98,7 @@ export class AgendaComponent implements OnInit {
   mapearAgendamentosParaView(): void {
     this.agendamentosView = this.agendamentos.map(agendamento => {
       const colaborador = this.colaboradores.find(c => c.id === agendamento.colaboradorId);
-      const cliente = this.clientes.find(c => c.id === agendamento.clienteId);
+      const cliente = this.clientes.find(c => c.id === agendamento.cliente?.id);
       
       if (!colaborador || !cliente) {
         console.error('Colaborador ou cliente não encontrado para agendamento:', agendamento);
@@ -235,7 +234,6 @@ export class AgendaComponent implements OnInit {
   abrirCalendario(): void {
     // Esta função seria implementada com um componente de calendário
     // para permitir que o usuário selecione uma data
-    console.log('Abrir calendário');
   }
 
   abrirFiltroModal(): void {

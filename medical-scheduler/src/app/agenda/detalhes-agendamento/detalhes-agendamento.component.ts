@@ -306,7 +306,7 @@ export class DetalhesAgendamentoComponent implements OnInit {
         if (agendamento) {
           this.agendamento = agendamento;
           this.carregarColaborador(agendamento.colaboradorId);
-          this.carregarCliente(agendamento.clienteId);
+          this.carregarCliente(agendamento.cliente!.id);
         } else {
           this.erro = true;
           this.mensagem = 'Agendamento não encontrado.';

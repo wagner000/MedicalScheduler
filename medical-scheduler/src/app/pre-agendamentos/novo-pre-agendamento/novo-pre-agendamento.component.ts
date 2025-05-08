@@ -9,6 +9,7 @@ import { PreAgendamentoService } from '../../services/pre-agendamento.service';
 import { ColaboradorService } from '../../services/colaborador.service';
 import { ClienteService } from '../../services/cliente.service';
 import { switchMap } from 'rxjs/operators';
+import { of } from 'rxjs';
 
 @Component({
   selector: 'app-novo-pre-agendamento',
@@ -46,9 +47,9 @@ export class NovoPreAgendamentoComponent implements OnInit {
   carregarColaboradores(): void {
     this.colaboradorService.getColaboradores().subscribe(colaboradores => {
       this.colaboradores = colaboradores;
-      if (colaboradores.length > 0) {
-        this.preAgendamento.colaboradorId = colaboradores[0].id;
-      }
+      // if (colaboradores.length > 0) {
+      //   this.preAgendamento.colaboradorId = colaboradores[0].id;
+      // }
     });
   }
 
@@ -133,42 +134,14 @@ export class NovoPreAgendamentoComponent implements OnInit {
       return;
     }
 
-    this.clienteService.getClienteByCpf(this.preAgendamento.cpf).pipe(
-      switchMap(clienteExistente => {
-        if (clienteExistente) {
-          // Se o cliente já existe, usa o cliente existente
-          return this.preAgendamentoService.addPreAgendamento(this.preAgendamento);
-        } else {
-          // Se o cliente não existe, cria um novo cliente
-          const novoCliente: Cliente = {
-            id: 0, // será gerado pelo serviço
-            nome: this.preAgendamento.nome,
-            cpf: this.preAgendamento.cpf || '', // garantir que não seja undefined
-            dataNascimento: new Date().toISOString().split('T')[0], // data atual como padrão
-            sexo: 'O', // O para Outro/Não informado
-            email: 'não informado',
-            telefone: 'não informado',
-            endereco: 'não informado'
-          };
-
-          // Primeiro cria o cliente, depois cria o pré-agendamento
-          return this.clienteService.addCliente(novoCliente).pipe(
-            switchMap(() => this.preAgendamentoService.addPreAgendamento(this.preAgendamento))
-          );
-        }
-      })
-    ).subscribe({
-      next: (preAgendamento) => {
-        this.mensagemSucesso = 'Pré-agendamento realizado com sucesso!';
-        setTimeout(() => {
-          this.router.navigate(['/pre-agendamentos']);
-        }, 1500);
-      },
-      error: (erro) => {
-        this.mensagemErro = 'Erro ao salvar pré-agendamento. Tente novamente.';
-        this.mensagemSucesso = '';
-        console.error('Erro:', erro);
+    this.clienteService.getClienteByCpf(this.preAgendamento.cpf).subscribe(cliente => {
+      if (cliente) {
+        this.preAgendamento.nome = cliente.nome;
       }
+    });
+    this.preAgendamentoService.addPreAgendamento(this.preAgendamento).subscribe(() => {
+      this.mensagemSucesso = 'Pré-agendamento salvo com sucesso!';
+      this.router.navigate(['/pre-agendamentos']);
     });
   }
 

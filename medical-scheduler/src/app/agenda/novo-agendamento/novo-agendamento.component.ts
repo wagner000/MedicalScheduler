@@ -195,7 +195,6 @@ export class NovoAgendamentoComponent implements OnInit {
   
   agendamento: Agendamento = {
     id: 0,
-    clienteId: 0,
     colaboradorId: 0,
     data: new Date().toISOString().split('T')[0],
     hora: '08:00',
@@ -280,11 +279,11 @@ export class NovoAgendamentoComponent implements OnInit {
     this.mensagemErro = '';
     
     if (this.clienteExistente) {
-      this.criarAgendamento(this.cliente.id);
+      this.criarAgendamento(this.cliente);
     } else {
       this.clienteService.addCliente(this.cliente).subscribe(
         novoCliente => {
-          this.criarAgendamento(novoCliente.id);
+          this.criarAgendamento(novoCliente);
         },
         error => {
           this.mensagemErro = 'Erro ao cadastrar o cliente. Tente novamente.';
@@ -293,10 +292,10 @@ export class NovoAgendamentoComponent implements OnInit {
     }
   }
   
-  private criarAgendamento(clienteId: number): void {
+  private criarAgendamento(cliente: Cliente): void {
     const novoAgendamento: Agendamento = {
       ...this.agendamento,
-      clienteId,
+      cliente,
       id: 0,
       status: StatusAgendamento.ABERTO
     };

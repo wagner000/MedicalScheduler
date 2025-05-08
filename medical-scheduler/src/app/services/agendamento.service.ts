@@ -15,7 +15,16 @@ export class AgendamentoService {
     {
       id: 1,
       colaboradorId: 1,
-      clienteId: 1,
+      cliente: {
+        id: 1,
+        nome: 'Cliente 1',
+        cpf: '12345678901',
+        dataNascimento: '2025-04-20',
+        sexo: 'M',
+        email: 'cliente1@email.com',
+        telefone: '123456789',
+        endereco: 'Endereço 1'
+      },
       data: '2025-04-20',
       hora: '05:00',
       status: StatusAgendamento.ABERTO,
@@ -24,7 +33,16 @@ export class AgendamentoService {
     {
       id: 2,
       colaboradorId: 1,
-      clienteId: 2,
+      cliente: {
+        id: 2,
+        nome: 'Cliente 2',
+        cpf: '12345678901',
+        dataNascimento: '2025-04-20',
+        sexo: 'M',
+        email: 'cliente2@email.com',
+        telefone: '123456789',
+        endereco: 'Endereço 2'
+      },
       data: '2025-04-20',
       hora: '10:30',
       status: StatusAgendamento.CONCLUIDO,
@@ -33,7 +51,16 @@ export class AgendamentoService {
     {
       id: 3,
       colaboradorId: 2,
-      clienteId: 3,
+      cliente: {
+        id: 3,
+        nome: 'Cliente 3',
+        cpf: '12345678901',
+        dataNascimento: '2025-04-20',
+        sexo: 'M',
+        email: 'cliente3@email.com',
+        telefone: '123456789',
+        endereco: 'Endereço 3'
+      },
       data: '2025-04-20',
       hora: '11:00',
       status: StatusAgendamento.ABERTO,
@@ -42,7 +69,16 @@ export class AgendamentoService {
     {
       id: 4,
       colaboradorId: 2,
-      clienteId: 1,
+      cliente: {
+        id: 1,
+        nome: 'Cliente 1',
+        cpf: '12345678901',
+        dataNascimento: '2025-04-20',
+        sexo: 'M',
+        email: 'cliente1@email.com',
+        telefone: '123456789',
+        endereco: 'Endereço 1'
+      },
       data: '2025-04-21',
       hora: '14:00',
       status: StatusAgendamento.ABERTO,
@@ -70,15 +106,12 @@ export class AgendamentoService {
   }
 
   getAgendamentosByClienteId(clienteId: number): Observable<Agendamento[]> {
-    const filteredAgendamentos = this.agendamentos.filter(a => a.clienteId === clienteId);
+    const filteredAgendamentos = this.agendamentos.filter(a => a.cliente?.id === clienteId);
     return of(filteredAgendamentos);
   }
 
   getAgendamentosByData(data: string): Observable<Agendamento[]> {
     const filteredAgendamentos = this.agendamentos.filter(a => a.data === data);
-    console.log('DATA', data);
-    console.log('AGENDAMENTOS', this.agendamentos);
-    console.log('FILTERED', filteredAgendamentos);
     return of(filteredAgendamentos);
   }
 
@@ -94,7 +127,6 @@ export class AgendamentoService {
     const newId = Math.max(...this.agendamentos.map(a => a.id)) + 1;
     const newAgendamento = { ...agendamento, id: newId };
     this.agendamentos.push(newAgendamento);
-    console.log(this.agendamentos);
     return of(newAgendamento);
   }
 
@@ -138,19 +170,15 @@ export class AgendamentoService {
       throw new Error('CPF é obrigatório para confirmar o agendamento');
     }
 
-    console.log('confirmarPreAgendamento', preAgendamento, hora);
-    
     // 1. Buscamos o cliente pelo CPF
     return this.clienteService.getClienteByCpf(preAgendamento.cpf).pipe(
       switchMap((clienteExistente: Cliente | undefined) => {
         // Se o cliente existir, retorna ele
         if (clienteExistente) {
-          console.log('Cliente existente encontrado:', clienteExistente);
           return of(clienteExistente);
         }
         
         // Se não existir, cria um novo
-        console.log('Cliente não encontrado, criando novo...');
         const novoCliente: Cliente = {
           id: 0, // será definido no service
           nome: preAgendamento.nome,
@@ -165,8 +193,6 @@ export class AgendamentoService {
       }),
       switchMap((cliente: Cliente) => {
         // 2. Criar o agendamento
-        console.log('Cliente para criar agendamento:', cliente);
-        
         if (!cliente || !cliente.id) {
           throw new Error('Cliente inválido ao criar agendamento');
         }
@@ -174,14 +200,12 @@ export class AgendamentoService {
         const novoAgendamento: Agendamento = {
           id: 0, // será definido no service
           colaboradorId: preAgendamento.colaboradorId,
-          clienteId: cliente.id,
+          cliente: cliente,
           data: preAgendamento.data,
           hora: hora,
           status: StatusAgendamento.ABERTO,
           observacoes: preAgendamento.observacoes || ''
         };
-
-        console.log('Criando novo agendamento:', novoAgendamento);
         // 3. Adicionar o agendamento
         return this.addAgendamento(novoAgendamento);
       }),

@@ -53,8 +53,8 @@
             [(ngModel)]="preAgendamento.colaboradorId" 
             required
           >
-            <option [ngValue]="0" disabled>Selecione um profissional</option>
-            <option *ngFor="let colaborador of colaboradores" [value]="colaborador.id">
+            <option disabled>Selecione um profissional</option>
+            <option *ngFor="let colaborador of colaboradores" [ngValue]="colaborador.id">
               {{ colaborador.nome }} ({{ colaborador.especialidade }})
             </option>
           </select>

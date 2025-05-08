@@ -282,7 +282,7 @@ export class EditarAgendamentoComponent implements OnInit {
               this.agendamentoOriginalColaboradorId = agendamento.colaboradorId;
               
               // Carregar o cliente
-              this.clienteService.getClienteById(agendamento.clienteId).subscribe(
+              this.clienteService.getClienteById(agendamento.cliente!.id).subscribe(
                 cliente => {
                   this.cliente = cliente;
                   this.carregando = false;
