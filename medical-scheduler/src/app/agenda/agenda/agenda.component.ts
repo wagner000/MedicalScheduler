@@ -46,6 +46,18 @@ export class AgendaComponent implements OnInit {
     private clienteService: ClienteService
   ) {}
 
+    /**
+   * recebe Date e retorna string no formato YYYY-MM-DD
+   * @param data 
+   * @returns string
+   */
+    getStringDate(data: Date): string {
+      const year = data.getFullYear();
+      const month = String(data.getMonth() + 1).padStart(2, '0');
+      const day = String(data.getDate()).padStart(2, '0');
+      return `${year}-${month}-${day}`;
+    }
+
   ngOnInit(): void {
     this.formatarData();
     this.carregarDados();
@@ -62,7 +74,7 @@ export class AgendaComponent implements OnInit {
 
   carregarDados(): void {
     // Converter a data para o formato YYYY-MM-DD para filtrar os agendamentos
-    const dataFormatadaYYYYMMDD = this.dataSelecionada.toISOString().split('T')[0];
+    const dataFormatadaYYYYMMDD = this.getStringDate(this.dataSelecionada);
 
     // Carregar colaboradores
     this.colaboradorService.getColaboradores().subscribe(colaboradores => {

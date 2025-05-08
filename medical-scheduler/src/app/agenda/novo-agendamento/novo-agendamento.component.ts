@@ -27,7 +27,7 @@ export class NovoAgendamentoComponent implements OnInit {
   agendamento: Agendamento = {
     id: 0,
     colaboradorId: 0,
-    data: new Date().toISOString().split('T')[0],
+    data: this.getStringDate(new Date()),
     hora: '08:00',
     status: StatusAgendamento.ABERTO
   };
@@ -43,8 +43,21 @@ export class NovoAgendamentoComponent implements OnInit {
     private clienteService: ClienteService,
     private agendamentoService: AgendamentoService
   ) {}
+
+  /**
+   * recebe Date e retorna string no formato YYYY-MM-DD
+   * @param data 
+   * @returns string
+   */
+  getStringDate(data: Date): string {
+    const year = data.getFullYear();
+    const month = String(data.getMonth() + 1).padStart(2, '0');
+    const day = String(data.getDate()).padStart(2, '0');
+    return `${year}-${month}-${day}`;
+  }
   
   ngOnInit(): void {
+    console.log(this.agendamento);
     this.carregarColaboradores();
   }
   
@@ -73,6 +86,7 @@ export class NovoAgendamentoComponent implements OnInit {
   }
   
   verificarDisponibilidade(): void {
+    console.log(this.agendamento);
     if (!this.agendamento.colaboradorId || !this.agendamento.data || !this.agendamento.hora) {
       return;
     }
