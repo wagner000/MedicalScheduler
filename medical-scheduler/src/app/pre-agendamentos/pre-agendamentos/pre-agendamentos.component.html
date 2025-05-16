@@ -1,7 +1,7 @@
 <div class="container">
   <div class="page-header">
-    <h1>Pré-agendamentos</h1>
-    <p>Gerenciamento de pré-agendamentos de pacientes</p>
+    <h1>Agendamentos</h1>
+    <p>Gerenciamento de agendamentos de pacientes</p>
   </div>
 
   <div class="scheduler-header">
@@ -44,7 +44,7 @@
     <div class="adicionar-container">
       <button class="btn-adicionar" (click)="novoPreAgendamento()">
         <i class="material-icons">add</i>
-        Novo pré-agendamento
+        Novo agendamento
       </button>
     </div>
   </div>
@@ -78,10 +78,10 @@
         <tr *ngIf="preAgendamentos.length === 0">
           <td colspan="6" class="sem-registros">
             <div class="sem-agendamentos">
-              <p>Não há pré-agendamentos para esta data.</p>
+              <p>Não há agendamentos para esta data.</p>
               <button class="btn-adicionar" (click)="novoPreAgendamento()">
                 <i class="material-icons">add</i>
-                Novo pré-agendamento
+                Novo agendamento
               </button>
             </div>
           </td>

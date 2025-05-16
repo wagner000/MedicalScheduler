@@ -47,9 +47,6 @@ export class NovoPreAgendamentoComponent implements OnInit {
   carregarColaboradores(): void {
     this.colaboradorService.getColaboradores().subscribe(colaboradores => {
       this.colaboradores = colaboradores;
-      // if (colaboradores.length > 0) {
-      //   this.preAgendamento.colaboradorId = colaboradores[0].id;
-      // }
     });
   }
 
@@ -140,7 +137,7 @@ export class NovoPreAgendamentoComponent implements OnInit {
       }
     });
     this.preAgendamentoService.addPreAgendamento(this.preAgendamento).subscribe(() => {
-      this.mensagemSucesso = 'Pré-agendamento salvo com sucesso!';
+      this.mensagemSucesso = 'Agendamento salvo com sucesso!';
       this.router.navigate(['/pre-agendamentos']);
     });
   }
